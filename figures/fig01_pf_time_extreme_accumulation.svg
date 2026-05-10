@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560">
+<rect width="100%" height="100%" fill="white"/>
+<text x="450.0" y="32" text-anchor="middle" font-family="Arial" font-size="20" font-weight="bold">Non-stationary liquefaction probability</text>
+<line x1="90" y1="490" x2="870" y2="490" stroke="#333"/>
+<line x1="90" y1="70" x2="90" y2="490" stroke="#333"/>
+<text x="450.0" y="540" text-anchor="middle" font-family="Arial" font-size="14">Time horizon (years)</text>
+<text x="24" y="280.0" transform="rotate(-90 24,280.0)" text-anchor="middle" font-family="Arial" font-size="14">Probability of liquefaction</text>
+<line x1="90.0" y1="490" x2="90.0" y2="496" stroke="#333"/>
+<text x="90.0" y="514" text-anchor="middle" font-family="Arial" font-size="12">0</text>
+<line x1="246.0" y1="490" x2="246.0" y2="496" stroke="#333"/>
+<text x="246.0" y="514" text-anchor="middle" font-family="Arial" font-size="12">10</text>
+<line x1="402.0" y1="490" x2="402.0" y2="496" stroke="#333"/>
+<text x="402.0" y="514" text-anchor="middle" font-family="Arial" font-size="12">20</text>
+<line x1="558.0" y1="490" x2="558.0" y2="496" stroke="#333"/>
+<text x="558.0" y="514" text-anchor="middle" font-family="Arial" font-size="12">30</text>
+<line x1="714.0" y1="490" x2="714.0" y2="496" stroke="#333"/>
+<text x="714.0" y="514" text-anchor="middle" font-family="Arial" font-size="12">40</text>
+<line x1="870.0" y1="490" x2="870.0" y2="496" stroke="#333"/>
+<text x="870.0" y="514" text-anchor="middle" font-family="Arial" font-size="12">50</text>
+<line x1="84" y1="490.0" x2="90" y2="490.0" stroke="#333"/>
+<line x1="90" y1="490.0" x2="870" y2="490.0" stroke="#e6e6e6"/>
+<text x="78" y="494.0" text-anchor="end" font-family="Arial" font-size="12">0.00</text>
+<line x1="84" y1="406.0" x2="90" y2="406.0" stroke="#333"/>
+<line x1="90" y1="406.0" x2="870" y2="406.0" stroke="#e6e6e6"/>
+<text x="78" y="410.0" text-anchor="end" font-family="Arial" font-size="12">0.21</text>
+<line x1="84" y1="322.0" x2="90" y2="322.0" stroke="#333"/>
+<line x1="90" y1="322.0" x2="870" y2="322.0" stroke="#e6e6e6"/>
+<text x="78" y="326.0" text-anchor="end" font-family="Arial" font-size="12">0.42</text>
+<line x1="84" y1="238.0" x2="90" y2="238.0" stroke="#333"/>
+<line x1="90" y1="238.0" x2="870" y2="238.0" stroke="#e6e6e6"/>
+<text x="78" y="242.0" text-anchor="end" font-family="Arial" font-size="12">0.62</text>
+<line x1="84" y1="154.0" x2="90" y2="154.0" stroke="#333"/>
+<line x1="90" y1="154.0" x2="870" y2="154.0" stroke="#e6e6e6"/>
+<text x="78" y="158.0" text-anchor="end" font-family="Arial" font-size="12">0.83</text>
+<line x1="84" y1="70.0" x2="90" y2="70.0" stroke="#333"/>
+<line x1="90" y1="70.0" x2="870" y2="70.0" stroke="#e6e6e6"/>
+<text x="78" y="74.0" text-anchor="end" font-family="Arial" font-size="12">1.04</text>
+<polyline points="90.0,193.0 121.2,191.8 152.4,192.2 183.6,195.3 214.8,192.8 246.0,196.5 277.2,201.3 308.4,204.1 339.6,201.9 370.8,203.6 402.0,207.6 433.2,211.0 464.4,210.6 495.6,212.1 526.8,213.1 558.0,145.8 589.2,170.0 620.4,158.8 651.6,130.7 682.8,117.6 714.0,134.4 745.2,156.2 776.4,144.3 807.6,115.3 838.8,115.0 870.0,122.5" fill="none" stroke="#1f77b4" stroke-width="3"/>
+<rect x="640" y="70" width="16" height="3" fill="#1f77b4"/>
+<text x="662" y="76" font-family="Arial" font-size="12">L1</text>
+<polyline points="90.0,289.8 121.2,304.8 152.4,300.6 183.6,277.5 214.8,267.7 246.0,287.2 277.2,301.9 308.4,295.0 339.6,273.2 370.8,262.1 402.0,279.5 433.2,296.5 464.4,286.8 495.6,259.3 526.8,253.8 558.0,190.2 589.2,206.1 620.4,201.2 651.6,172.5 682.8,166.0 714.0,180.7 745.2,197.8 776.4,190.2 807.6,167.6 838.8,162.8 870.0,171.8" fill="none" stroke="#d62728" stroke-width="3"/>
+<rect x="640" y="94" width="16" height="3" fill="#d62728"/>
+<text x="662" y="100" font-family="Arial" font-size="12">L2</text>
+<polyline points="90.0,402.5 121.2,411.1 152.4,406.9 183.6,390.9 214.8,390.0 246.0,397.7 277.2,405.2 308.4,406.4 339.6,389.4 370.8,384.2 402.0,393.8 433.2,406.1 464.4,400.6 495.6,386.8 526.8,380.0 558.0,340.6 589.2,351.5 620.4,348.1 651.6,329.5 682.8,321.1 714.0,332.4 745.2,345.5 776.4,341.4 807.6,317.2 838.8,318.4 870.0,324.8" fill="none" stroke="#2ca02c" stroke-width="3"/>
+<rect x="640" y="118" width="16" height="3" fill="#2ca02c"/>
+<text x="662" y="124" font-family="Arial" font-size="12">L3</text>
+<polyline points="90.0,473.9 121.2,475.0 152.4,475.4 183.6,471.6 214.8,471.4 246.0,473.0 277.2,473.7 308.4,475.1 339.6,470.5 370.8,468.5 402.0,470.7 433.2,473.2 464.4,473.8 495.6,468.5 526.8,468.3 558.0,454.5 589.2,459.7 620.4,456.8 651.6,452.2 682.8,448.4 714.0,450.8 745.2,455.7 776.4,455.7 807.6,448.3 838.8,447.0 870.0,450.5" fill="none" stroke="#9467bd" stroke-width="3"/>
+<rect x="640" y="142" width="16" height="3" fill="#9467bd"/>
+<text x="662" y="148" font-family="Arial" font-size="12">L4</text>
+</svg>

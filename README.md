@@ -19,6 +19,7 @@ The benchmark evaluates how time-dependent groundwater depth and gradation chang
 - `data/liquefaction_benchmark_results.csv`: layer-time-scenario Monte Carlo results.
 - `data/liquefaction_benchmark_summary.csv`: scenario-level summary.
 - `data/profile_method_comparison.csv`: stationary versus non-stationary profile comparison.
+- `data/monte_carlo_convergence_check.csv`: repeated-sample convergence check for the most severe benchmark state.
 - `figures/fig01_pf_time_extreme_accumulation.png`: layer probability histories.
 - `figures/fig02_profile_mean_pf_by_scenario.png`: profile-average probability by groundwater scenario.
 - `figures/fig03_depth_time_pf_heatmap.png`: depth-time probability map.
@@ -40,6 +41,8 @@ Python dependencies:
 - Pillow
 
 The random seed is fixed as `1182026`.
+
+The main results file includes approximate 95% binomial confidence intervals for both stationary and non-stationary liquefaction probabilities. The convergence file repeats the most severe state with 1,000, 3,000, 6,000, and 12,000 samples to document Monte Carlo stability.
 
 ## Methodological note
 

@@ -135,6 +135,8 @@ def run() -> tuple[pd.DataFrame, pd.DataFrame]:
                 for year in YEARS:
                     stationary = pf_from_samples(layer, year, sc, grad, "stationary")
                     nonstationary = pf_from_samples(layer, year, sc, grad, "nonstationary")
+                    se_stat = math.sqrt(max(stationary["pf"] * (1.0 - stationary["pf"]), 0.0) / N_MC)
+                    se_non = math.sqrt(max(nonstationary["pf"] * (1.0 - nonstationary["pf"]), 0.0) / N_MC)
                     rows.append(
                         {
                             "scenario": sc["scenario"],
@@ -143,7 +145,11 @@ def run() -> tuple[pd.DataFrame, pd.DataFrame]:
                             "z_mid_m": layer.z_mid_m,
                             "year": year,
                             "pf_stationary": stationary["pf"],
+                            "pf_stationary_ci_low": max(0.0, stationary["pf"] - 1.96 * se_stat),
+                            "pf_stationary_ci_high": min(1.0, stationary["pf"] + 1.96 * se_stat),
                             "pf_nonstationary": nonstationary["pf"],
+                            "pf_nonstationary_ci_low": max(0.0, nonstationary["pf"] - 1.96 * se_non),
+                            "pf_nonstationary_ci_high": min(1.0, nonstationary["pf"] + 1.96 * se_non),
                             "delta_pf": nonstationary["pf"] - stationary["pf"],
                             "fs_deterministic_nonstationary": nonstationary["fs_deterministic"],
                             "gw_depth_m": nonstationary["gw_depth_m"],
@@ -374,6 +380,31 @@ def main() -> None:
     )
     comp["delta"] = comp.nonstationary - comp.stationary
     comp.to_csv(DATA / "profile_method_comparison.csv", index=False)
+    convergence_rows = []
+    target_layer = LAYERS.iloc[0]
+    target_sc = next(s for s in SCENARIOS if s["scenario"] == "extreme")
+    target_grad = next(g for g in GRADATIONS if g["gradation"] == "fines_washout")
+    global N_MC, RNG
+    original_n = N_MC
+    for n in [1000, 3000, 6000, 12000]:
+        N_MC = n
+        vals = []
+        for rep in range(5):
+            RNG = np.random.default_rng(1182026 + n + rep)
+            vals.append(pf_from_samples(target_layer, 50, target_sc, target_grad, "nonstationary")["pf"])
+        convergence_rows.append(
+            {
+                "sample_size": n,
+                "replicates": 5,
+                "mean_pf": float(np.mean(vals)),
+                "std_pf": float(np.std(vals, ddof=1)),
+                "min_pf": float(np.min(vals)),
+                "max_pf": float(np.max(vals)),
+            }
+        )
+    N_MC = original_n
+    RNG = np.random.default_rng(1182026)
+    pd.DataFrame(convergence_rows).to_csv(DATA / "monte_carlo_convergence_check.csv", index=False)
     print("Wrote benchmark outputs to", ROOT)
     print(summary.head(8).to_string(index=False))
 

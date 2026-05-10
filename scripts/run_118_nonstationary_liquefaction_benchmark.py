@@ -393,6 +393,117 @@ def png_bar(path: Path, title: str, labels: list[str], values: list[float], xlab
     img.save(path, "PNG")
 
 
+def _numeric_column(series: pd.Series) -> pd.Series:
+    """Parse numeric columns that contain symbols such as *, <5, ~5, or footnote letters."""
+    cleaned = (
+        series.astype(str)
+        .str.replace("～", "~", regex=False)
+        .str.replace("*", "", regex=False)
+        .str.replace("<", "", regex=False)
+        .str.replace(">", "", regex=False)
+        .str.replace("~", "", regex=False)
+        .str.extract(r"([-+]?\d*\.?\d+)", expand=False)
+    )
+    return pd.to_numeric(cleaned, errors="coerce")
+
+
+def _rank_auc(scores: pd.Series, labels: pd.Series) -> float:
+    """AUC from average ranks, avoiding an extra machine-learning dependency."""
+    valid = scores.notna() & labels.notna()
+    scores = scores[valid]
+    labels = labels[valid].astype(int)
+    n_pos = int(labels.sum())
+    n_neg = int((1 - labels).sum())
+    if n_pos == 0 or n_neg == 0:
+        return float("nan")
+    ranks = scores.rank(method="average")
+    rank_sum_pos = float(ranks[labels.eq(1)].sum())
+    return (rank_sum_pos - n_pos * (n_pos + 1) / 2.0) / (n_pos * n_neg)
+
+
+def external_case_history_sanity_check() -> tuple[pd.DataFrame, pd.DataFrame]:
+    """External trend-discrimination check using the open Hu et al. (2021) case-history dataset.
+
+    This is not site calibration. It checks whether simple demand/resistance and groundwater
+    indicators rank historical liquefied cases above non-liquefied cases in the expected direction.
+    """
+    source = DATA / "external_hu_2021_gravelly_liquefaction_cases.xlsx"
+    if not source.exists():
+        return pd.DataFrame(), pd.DataFrame()
+
+    raw = pd.read_excel(source, sheet_name="Data")
+    label = raw["Liqefied ？"].astype(str).str.strip().str.lower()
+    df = pd.DataFrame(
+        {
+            "case_no": _numeric_column(raw["Case No."]),
+            "earthquake": raw["Earthquake Name"].astype(str),
+            "site": raw["Site location & Borehole name"].astype(str),
+            "liquefied": label.map({"yes": 1, "no": 0}),
+            "mw": _numeric_column(raw["Mw"]),
+            "pga": _numeric_column(raw["PGA"]),
+            "csr75": _numeric_column(raw["CSR7.5"]),
+            "fc_pct": _numeric_column(raw["FC (%)"]),
+            "gc_pct": _numeric_column(raw["GC (%)"]),
+            "n120": _numeric_column(raw["N'120"]),
+            "vs1_ms": _numeric_column(raw["Vs1 (m/s)"]),
+            "dw_m": _numeric_column(raw["Dw (m)"]),
+            "ds_m": _numeric_column(raw["Ds (m)"]),
+            "hn_m": _numeric_column(raw["Hn (m)"]),
+            "dn_m": _numeric_column(raw["Dn (m)"]),
+        }
+    ).dropna(subset=["liquefied", "csr75", "dw_m"])
+
+    def zscore(s: pd.Series, inverse: bool = False) -> pd.Series:
+        x = s.astype(float)
+        z = (x - x.mean()) / max(float(x.std(ddof=0)), 1e-9)
+        return -z if inverse else z
+
+    df["shallow_groundwater_index"] = zscore(df["dw_m"], inverse=True)
+    df["demand_index"] = zscore(df["csr75"])
+    df["dpt_resistance_index"] = zscore(df["n120"], inverse=True)
+    df["vs_resistance_index"] = zscore(df["vs1_ms"], inverse=True)
+    df["capping_index"] = zscore(df["dn_m"].fillna(df["dn_m"].median()), inverse=True)
+    df["dpt_screening_score"] = (
+        0.45 * df["demand_index"]
+        + 0.30 * df["dpt_resistance_index"]
+        + 0.20 * df["shallow_groundwater_index"]
+        + 0.05 * df["capping_index"]
+    )
+    df["vs_screening_score"] = (
+        0.45 * df["demand_index"]
+        + 0.30 * df["vs_resistance_index"]
+        + 0.20 * df["shallow_groundwater_index"]
+        + 0.05 * df["capping_index"]
+    )
+    df["combined_instrument_score"] = (
+        0.35 * df["demand_index"]
+        + 0.40 * ((df["dpt_resistance_index"] + df["vs_resistance_index"]) / 2.0)
+        + 0.20 * df["shallow_groundwater_index"]
+        + 0.05 * df["capping_index"]
+    )
+
+    summary_rows = []
+    for score in ["combined_instrument_score", "dpt_screening_score", "vs_screening_score", "demand_index", "shallow_groundwater_index"]:
+        valid = df.dropna(subset=[score, "liquefied"])
+        liq = valid[valid["liquefied"].eq(1)][score]
+        non = valid[valid["liquefied"].eq(0)][score]
+        summary_rows.append(
+            {
+                "check": score,
+                "n_cases": int(valid.shape[0]),
+                "n_liquefied": int(valid["liquefied"].sum()),
+                "n_non_liquefied": int(valid.shape[0] - valid["liquefied"].sum()),
+                "mean_liquefied": float(liq.mean()),
+                "mean_non_liquefied": float(non.mean()),
+                "median_liquefied": float(liq.median()),
+                "median_non_liquefied": float(non.median()),
+                "rank_auc_liquefied_higher": float(_rank_auc(valid[score], valid["liquefied"])),
+            }
+        )
+    summary = pd.DataFrame(summary_rows)
+    return df, summary
+
+
 def main() -> None:
     results, summary = run()
     results.to_csv(DATA / "liquefaction_benchmark_results.csv", index=False)
@@ -468,6 +579,25 @@ def main() -> None:
         ]
     )
     external.to_csv(DATA / "external_trend_consistency_checks.csv", index=False)
+    ext_cases, ext_summary = external_case_history_sanity_check()
+    if not ext_cases.empty:
+        ext_cases.to_csv(DATA / "external_case_history_sanity_check.csv", index=False)
+        ext_summary.to_csv(DATA / "external_case_history_sanity_summary.csv", index=False)
+        ext_plot = ext_summary[ext_summary["check"].isin(["combined_instrument_score", "dpt_screening_score", "vs_screening_score", "demand_index", "shallow_groundwater_index"])]
+        svg_bar(
+            FIGURES / "fig05_external_case_history_sanity_auc.svg",
+            "External case-history sanity check",
+            ext_plot["check"].tolist(),
+            ext_plot["rank_auc_liquefied_higher"].tolist(),
+            "AUC: liquefied cases ranked higher",
+        )
+        png_bar(
+            FIGURES / "fig05_external_case_history_sanity_auc.png",
+            "External case-history sanity check",
+            ext_plot["check"].tolist(),
+            ext_plot["rank_auc_liquefied_higher"].tolist(),
+            "AUC: liquefied cases ranked higher",
+        )
     convergence_rows = []
     target_layer = LAYERS.iloc[0]
     target_sc = next(s for s in SCENARIOS if s["scenario"] == "extreme")

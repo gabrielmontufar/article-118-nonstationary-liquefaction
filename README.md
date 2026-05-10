@@ -22,10 +22,14 @@ The benchmark evaluates how time-dependent groundwater depth and gradation chang
 - `data/monte_carlo_convergence_check.csv`: repeated-sample convergence check for the most severe benchmark state.
 - `data/global_sensitivity_rank.csv`: rank-correlation sensitivity check for the non-stationary liquefaction probability.
 - `data/external_trend_consistency_checks.csv`: traceability table linking benchmark assumptions to external literature trends.
+- `data/external_hu_2021_gravelly_liquefaction_cases.xlsx`: open supplementary dataset from Hu et al. (2021), Data in Brief, used only for a secondary external sanity check.
+- `data/external_case_history_sanity_check.csv`: parsed case-history variables and screening scores for the external sanity check.
+- `data/external_case_history_sanity_summary.csv`: AUC and mean/median checks comparing liquefied and non-liquefied historical cases, including demand-only, groundwater-only, DPT, Vs, and combined-instrument screening scores.
 - `figures/fig01_pf_time_extreme_accumulation.png`: layer probability histories.
 - `figures/fig02_profile_mean_pf_by_scenario.png`: profile-average probability by groundwater scenario.
 - `figures/fig03_depth_time_pf_heatmap.png`: depth-time probability map.
 - `figures/fig04_global_sensitivity_rank.png`: global rank-correlation sensitivity chart.
+- `figures/fig05_external_case_history_sanity_auc.png`: AUC chart for the external case-history sanity check.
 
 SVG versions of the figures are also included for editable vector use.
 
@@ -42,10 +46,15 @@ Python dependencies:
 - numpy
 - pandas
 - Pillow
+- openpyxl
 
 The random seed is fixed as `1182026`.
 
 The main results file includes approximate 95% binomial confidence intervals for both stationary and non-stationary liquefaction probabilities. The convergence file repeats the most severe state with 1,000, 3,000, 6,000, and 12,000 samples to document Monte Carlo stability.
+
+## External sanity check
+
+The benchmark includes a secondary external check using the open case-history dataset of Hu et al. (2021), Data in Brief, DOI: `10.1016/j.dib.2021.107104`. This check does not calibrate the synthetic benchmark to a field site. It tests whether simple demand/resistance and groundwater screening indices rank historical liquefied cases above non-liquefied cases in the expected direction.
 
 ## Methodological note
 
